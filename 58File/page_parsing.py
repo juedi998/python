@@ -2,12 +2,12 @@
 from bs4 import BeautifulSoup
 import requests,time,pymongo,random
 start_url = r'http://gz.58.com/sale.shtml'
-client = pymongo.MongoClient('localhost',27017)
+client = pymongo.MongoClient('localhost',27017) #连接数据库
 tongcheng = client['tongcheng']
 info = tongcheng['info']
 url = tongcheng['url']
 #spider 1
-def get_links_from(channel,pages):
+def get_links_from(channel,pages): #获取分页的所有链接信息
     headers = {
         'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
     }
@@ -41,10 +41,10 @@ def get_links_from(channel,pages):
                 pass  # Nothing
         else:
             pass
-    except IndexError or requests.ConnectionError:
+    except IndexError or requests.ConnectionError: #出错将自动进入休眠期
         print('由于远端服务器积极拒绝，本程序将休眠20秒后重新启动！.....')
         time.sleep(120)
-def get_item_info(url):
+def get_item_info(url): #获取详情页信息
     web_data = requests.get(url)
     time.sleep(2)
     soup = BeautifulSoup(web_data.text,'lxml')
@@ -61,7 +61,7 @@ def get_item_info(url):
         print('卖家头像地址：' + imgs.get('src'))
         info.insert_one({'title':titles.get_text(),'price':prices.get_text(),'acre':acres.get_text(),'name':names.get_text(),'img':imgs.get('src')})
         Download_imgFile(imgs.get('src'),names.get_text())
-def Download_imgFile(img_url,name):
+def Download_imgFile(img_url,name): #用于下载图片
     number = random.random()
     File_path = 'D:/python工程/四周/01-02/img/'+ name + '.jpg'
     Down_image = requests.get(img_url,stream=True)
